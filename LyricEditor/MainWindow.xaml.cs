@@ -168,6 +168,12 @@ namespace LyricEditor
             isPlaying = false;
         }
 
+        public void TmpStop()
+        {
+            Stop();
+        }
+
+
         #endregion
 
         #region 内部方法

@@ -153,19 +153,40 @@ namespace LyricEditor.UserControls
         public void SetJumoTime()
         {
 
-            int index = SelectedIndex;
-            LrcLine nextLine = null;
-            if (index < 0) return;
+            if(MyMainWindow.MediaPlayer.Position.TotalMilliseconds<100)
+            {//双击歌词播放时，position值更新慢
+                int index = SelectedIndex;
+                LrcLine nextLine = null;
+                if (index < 0) return;
 
-            if (index < LrcLinePanel.Items.Count-1) //读取下一行
-            {
-                nextLine = LrcLinePanel.Items[index + 1] as LrcLine;
-                jumoTime = nextLine.LrcTime.Value.TotalMilliseconds;
+                if (index < LrcLinePanel.Items.Count - 1) //读取下一行
+                {
+                    nextLine = LrcLinePanel.Items[index + 1] as LrcLine;
+                    jumoTime = nextLine.LrcTime.Value.TotalMilliseconds;
+                }
+                else
+                {
+                    jumoTime = 0;
+                }
+
             }
             else
             {
                 jumoTime = 0;
+                foreach (LrcLine line in LrcLinePanel.Items)
+                {//根据当前播放位置设置句末时间
+                    if (line.LrcTime.Value.TotalMilliseconds > MyMainWindow.MediaPlayer.Position.TotalMilliseconds)
+                    {
+                        //MyMainWindow.TmpStop();
+                        jumoTime = line.LrcTime.Value.TotalMilliseconds;
+                        break;
+
+                    }
+                }
             }
+
+
+
         }
 
         /// <summary>
