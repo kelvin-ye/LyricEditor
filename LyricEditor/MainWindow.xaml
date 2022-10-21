@@ -422,6 +422,14 @@
                     </Button.ToolTip>
                     <Image Margin="1" Source="Icons/ToolButtonIcons/Navigate-down.png" />
                 </Button>
+                <Button 
+                    Name="JuMoTingDunButton"
+                    Click="JuMoTingDun_Click">
+                    <Button.ToolTip>
+                        切换句末停顿
+                    </Button.ToolTip>
+                    <Image Source="Icons/ToolButtonIcons/jubuting.png" />
+                </Button>
             </StackPanel>
         </StackPanel>
 

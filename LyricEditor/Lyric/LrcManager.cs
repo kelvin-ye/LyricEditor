@@ -292,7 +292,17 @@ namespace LyricEditor.Lyric
             LrcList[index + 1] = temp;
             UpdateLrcList(list, index + 1);
         }
+        /// <summary>
+        /// 高亮显示下一行
+        /// </summary>
+        public void ShowNextLine(ListView list)
+        {
+            int index = list.SelectedIndex;
+            // 未选中，或选择最下面一行
+            if (index < 0 || index == LrcList.Count - 1) return;
 
+            UpdateLrcList(list, index + 1);
+        }
         /// <summary>
         /// 根据歌词列表更新列表项的显示
         /// </summary>

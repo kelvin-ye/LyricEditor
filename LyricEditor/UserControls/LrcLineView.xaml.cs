@@ -23,6 +23,8 @@ namespace LyricEditor.UserControls
         public LrcManager Manager { get; set; }
         public MainWindow MyMainWindow;
 
+        public double  jumoTime = 0; // 根据下一行的起始时间得出的句末时间
+
         public TimeSpan TimeOffset { get; set; } = new TimeSpan(0, 0, 0, 0, -150);
         public bool ApproxTime { get; set; } = false;
 
@@ -142,6 +144,30 @@ namespace LyricEditor.UserControls
                 AdjustCurrentLineTime(new TimeSpan(0, 0, 0, 0, -50));
             }
         }
+
+
+        ///<summary>
+        ///根据下一行的时间，设置停止时间
+        ///</summary>
+        ///
+        public void SetJumoTime()
+        {
+
+            int index = SelectedIndex;
+            LrcLine nextLine = null;
+            if (index < 0) return;
+
+            if (index < LrcLinePanel.Items.Count-1) //读取下一行
+            {
+                nextLine = LrcLinePanel.Items[index + 1] as LrcLine;
+                jumoTime = nextLine.LrcTime.Value.TotalMilliseconds;
+            }
+            else
+            {
+                jumoTime = 0;
+            }
+        }
+
         /// <summary>
         /// 双击主列表，跳转播放时间
         /// </summary>
@@ -151,6 +177,7 @@ namespace LyricEditor.UserControls
 
             LrcLine line = LrcLinePanel.SelectedItem as LrcLine;
             if (!line.LrcTime.HasValue) return;
+            MyMainWindow.LinePlay_DoubleClick();// 增加功能，双击行自动开始播放
 
             MyMainWindow.MediaPlayer.Position = line.LrcTime.Value;
         }
@@ -240,6 +267,11 @@ namespace LyricEditor.UserControls
         public void MoveDown()
         {
             Manager.MoveDown(LrcLinePanel);
+        }
+		//自动高亮显示当前行
+        public void ShowNextLine()
+        {
+            Manager.ShowNextLine(LrcLinePanel);
         }
 
     }

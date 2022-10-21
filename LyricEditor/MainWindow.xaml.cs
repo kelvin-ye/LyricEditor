@@ -50,6 +50,13 @@ namespace LyricEditor
         /// </summary>
         private bool isPlaying = false;
 
+        /// <summary>
+        /// 表示句末是否停顿
+        /// </summary>
+        private bool isJuTing = false;
+
+
+
         private LrcLineView LrcLinePanel;
         private LrcTextView LrcTextPanel;
 
@@ -80,6 +87,28 @@ namespace LyricEditor
             if (!IsMediaAvailable) return;
 
             var current = MediaPlayer.Position;
+			
+
+
+			//如果句末功能启动，自动句末暂停
+            if (isJuTing == true)
+            {
+                if(LrcLinePanel.jumoTime>0 && current.TotalMilliseconds>= LrcLinePanel.jumoTime)
+                {
+                    Stop();
+                    LrcLinePanel.jumoTime = 0;
+                }
+			    //自动高亮显示下一行
+                LrcLine line = LrcLinePanel.SelectedItem as LrcLine;
+                if ( LrcLinePanel.jumoTime!=0 && LrcLinePanel.jumoTime <= current.TotalMilliseconds )
+                {
+                    LrcLinePanel.ShowNextLine();
+                    LrcLinePanel.SetJumoTime();
+                }
+            }
+
+
+
             CurrentTimeText.Text = $"{current.Minutes:00}:{current.Seconds:00}";
 
             TimeBackground.Value = MediaPlayer.Position.TotalSeconds / MediaPlayer.NaturalDuration.TimeSpan.TotalSeconds;
@@ -100,7 +129,11 @@ namespace LyricEditor
         }
         private void Play()
         {
-            if (!IsMediaAvailable) return;
+            if (!IsMediaAvailable)
+            {
+                ImportMedia_Click(this, null); //参数无用
+                return;
+            }
 
             MediaPlayer.Play();
 
@@ -483,6 +516,19 @@ namespace LyricEditor
                 Pause();
             }
         }
+
+        /// <summary>
+        /// 歌词行双击开始播放
+        /// </summary>
+        public void LinePlay_DoubleClick()
+        {
+            if (!isPlaying)
+            {
+                Play();
+                LrcLinePanel.SetJumoTime();// 双击设置句末时间
+            }
+
+        }
         /// <summary>
         /// 停止按钮
         /// </summary>
@@ -596,6 +642,35 @@ namespace LyricEditor
         {
             LrcLinePanel.MoveDown();
         }
+
+
+        /// <summary>
+        /// 切换句末停顿
+        /// </summary>
+        private void JuMoTingDun_Click(object sender, RoutedEventArgs e)
+        {
+            if(isJuTing)
+            {//切换为句末不停
+                var image = (Image)JuMoTingDunButton.Content;
+                image.Source = new BitmapImage(new Uri("Icons/ToolButtonIcons/jubuting.png", UriKind.RelativeOrAbsolute));
+                image.Margin = new Thickness(0);
+                isJuTing = false;
+                LrcLinePanel.SetJumoTime();
+
+            }
+            else
+            {//切换为句末停止
+                var image = (Image)JuMoTingDunButton.Content;
+                image.Source = new BitmapImage(new Uri("Icons/ToolButtonIcons/juting.png", UriKind.RelativeOrAbsolute));
+                image.Margin = new Thickness(0);
+                isJuTing = true;
+                LrcLinePanel.SetJumoTime();
+
+            }
+
+
+        }
+
         /// <summary>
         /// 清空所有时间标记
         /// </summary>

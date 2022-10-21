@@ -249,5 +249,11 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\ToolButtonIcons\jubuting.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\ToolButtonIcons\juting.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
