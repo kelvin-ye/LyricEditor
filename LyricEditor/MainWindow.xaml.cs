@@ -87,32 +87,51 @@ namespace LyricEditor
             if (!IsMediaAvailable) return;
 
             var current = MediaPlayer.Position;
-			
 
-
-			//如果句末功能启动，自动句末暂停
+           // Console.WriteLine(string.Format("isJuTing={0},jumoTime={1},current={2}", isJuTing, LrcLinePanel.jumoTime,current));
+            //如果句末功能启动，自动句末暂停
             if (isJuTing == true)
             {
-                if(LrcLinePanel.jumoTime>0 && current.TotalMilliseconds>= LrcLinePanel.jumoTime)
+                //if(LrcLinePanel.jumoTime.TotalMilliseconds>0 && current.TotalMilliseconds>= LrcLinePanel.jumoTime.TotalMilliseconds)
+                if(current.TotalMilliseconds >= LrcLinePanel.jumoTime.TotalMilliseconds)
                 {
-                    Stop();
-                    LrcLinePanel.jumoTime = 0;
+                    //Stop();
+                    Pause();
+                    //LrcLinePanel.jumoTime = new TimeSpan();
+                    return;
+
+
                 }
-			    //自动高亮显示下一行
-                LrcLine line = LrcLinePanel.SelectedItem as LrcLine;
-                if ( LrcLinePanel.jumoTime!=0 && LrcLinePanel.jumoTime <= current.TotalMilliseconds )
-                {
-                    LrcLinePanel.ShowNextLine();
-                    LrcLinePanel.SetJumoTime();
-                }
+           //     else
+           //     {
+			        ////自动高亮显示下一行
+           //         LrcLine line = LrcLinePanel.SelectedItem as LrcLine;
+           //         Console.WriteLine(string.Format("jumoTime={0},current={1}", LrcLinePanel.jumoTime, current));
+           //         if ( LrcLinePanel.jumoTime.TotalMilliseconds != 0 && LrcLinePanel.jumoTime.TotalMilliseconds <= current.TotalMilliseconds )
+           //         {
+           //             LrcLinePanel.ShowNextLine();
+           //             LrcLinePanel.SetJumoTime(line);
+           //         }
+           //     }
+
             }
+            else
+            {
+
+                           //  LrcLinePanel.SetJumoTime(MediaPlayer.Position);
+            }
+
+
 
 
 
             CurrentTimeText.Text = $"{current.Minutes:00}:{current.Seconds:00}";
 
             TimeBackground.Value = MediaPlayer.Position.TotalSeconds / MediaPlayer.NaturalDuration.TimeSpan.TotalSeconds;
-            CurrentLrcText.Text = Manager.GetNearestLrc(MediaPlayer.Position);
+
+            var 从下一句句首移到本句尾 = new TimeSpan(0, 0, 0, 0, 0);
+            //文本显示稍微延迟一点，停在句末
+            CurrentLrcText.Text = Manager.GetNearestLrc(MediaPlayer.Position- 从下一句句首移到本句尾);
         }
 
         #endregion
@@ -526,13 +545,16 @@ namespace LyricEditor
         /// <summary>
         /// 歌词行双击开始播放
         /// </summary>
-        public void LinePlay_DoubleClick()
+        public void LinePlay_DoubleClick(LrcLine line)
         {
-            if (!isPlaying)
+            if (IsMediaAvailable)
             {
-                Play();
-                LrcLinePanel.SetJumoTime();// 双击设置句末时间
+                LrcLinePanel.SetJumoTime(line.LrcTime.Value);// 双击设置句末时间
+                MediaPlayer.Position = line.LrcTime.Value;
             }
+
+                Play();
+
 
         }
         /// <summary>
@@ -655,13 +677,17 @@ namespace LyricEditor
         /// </summary>
         private void JuMoTingDun_Click(object sender, RoutedEventArgs e)
         {
-            if(isJuTing)
+            LrcLine line = LrcLinePanel.SelectedItem as LrcLine;
+            Console.WriteLine(string.Format("isJuTing={0},line={1}", isJuTing, line));
+            if (isJuTing)
             {//切换为句末不停
                 var image = (Image)JuMoTingDunButton.Content;
                 image.Source = new BitmapImage(new Uri("Icons/ToolButtonIcons/jubuting.png", UriKind.RelativeOrAbsolute));
                 image.Margin = new Thickness(0);
                 isJuTing = false;
-                LrcLinePanel.SetJumoTime();
+
+                //LrcLinePanel.SetJumoTime(line.LrcTime.Value);
+                LrcLinePanel.SetJumoTime(MediaPlayer.Position);
 
             }
             else
@@ -670,7 +696,8 @@ namespace LyricEditor
                 image.Source = new BitmapImage(new Uri("Icons/ToolButtonIcons/juting.png", UriKind.RelativeOrAbsolute));
                 image.Margin = new Thickness(0);
                 isJuTing = true;
-                LrcLinePanel.SetJumoTime();
+                //LrcLinePanel.SetJumoTime(line.LrcTime.Value);
+                LrcLinePanel.SetJumoTime(MediaPlayer.Position);
 
             }
 

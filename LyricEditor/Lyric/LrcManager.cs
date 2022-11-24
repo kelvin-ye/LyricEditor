@@ -324,6 +324,8 @@ namespace LyricEditor.Lyric
         {
             UpdateLrcList(list);
             list.SelectedIndex = index;
+            LrcLine line = list.SelectedItem as LrcLine;
+            Console.WriteLine(string.Format("line={0}",  line));
             list.ScrollIntoView(list.SelectedItem);
         }
         /// <summary>

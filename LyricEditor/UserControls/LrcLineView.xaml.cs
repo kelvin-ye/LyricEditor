@@ -23,7 +23,8 @@ namespace LyricEditor.UserControls
         public LrcManager Manager { get; set; }
         public MainWindow MyMainWindow;
 
-        public double  jumoTime = 0; // 根据下一行的起始时间得出的句末时间
+        //public double  jumoTime = 0; // 根据下一行的起始时间得出的句末时间
+        public TimeSpan jumoTime { get; set; } = new TimeSpan(0, 0, 0, 0, 0); // 根据下一行的起始时间得出的句末时间
 
         public TimeSpan TimeOffset { get; set; } = new TimeSpan(0, 0, 0, 0, -150);
         public bool ApproxTime { get; set; } = false;
@@ -150,7 +151,7 @@ namespace LyricEditor.UserControls
         ///根据下一行的时间，设置停止时间
         ///</summary>
         ///
-        public void SetJumoTime()
+        public void SetJumoTime( TimeSpan CurrentTime)
         {
 
             if(MyMainWindow.MediaPlayer.Position.TotalMilliseconds<100)
@@ -162,23 +163,24 @@ namespace LyricEditor.UserControls
                 if (index < LrcLinePanel.Items.Count - 1) //读取下一行
                 {
                     nextLine = LrcLinePanel.Items[index + 1] as LrcLine;
-                    jumoTime = nextLine.LrcTime.Value.TotalMilliseconds;
+                    jumoTime = nextLine.LrcTime.Value;
                 }
                 else
                 {
-                    jumoTime = 0;
+                    //jumoTime = new TimeSpan();
+                    jumoTime = MyMainWindow.MediaPlayer.NaturalDuration.TimeSpan;
                 }
 
             }
             else
             {
-                jumoTime = 0;
+                jumoTime = MyMainWindow.MediaPlayer.NaturalDuration.TimeSpan;
                 foreach (LrcLine line in LrcLinePanel.Items)
-                {//根据当前播放位置设置句末时间
-                    if (line.LrcTime.Value.TotalMilliseconds > MyMainWindow.MediaPlayer.Position.TotalMilliseconds)
+                {//根据当前选中行设置句末时间
+                    if (line.LrcTime.Value.TotalMilliseconds > CurrentTime.TotalMilliseconds)
                     {
                         //MyMainWindow.TmpStop();
-                        jumoTime = line.LrcTime.Value.TotalMilliseconds;
+                        jumoTime = line.LrcTime.Value;
                         break;
 
                     }
@@ -198,7 +200,7 @@ namespace LyricEditor.UserControls
 
             LrcLine line = LrcLinePanel.SelectedItem as LrcLine;
             if (!line.LrcTime.HasValue) return;
-            MyMainWindow.LinePlay_DoubleClick();// 增加功能，双击行自动开始播放
+            MyMainWindow.LinePlay_DoubleClick(line);// 增加功能，双击行自动开始播放
 
             MyMainWindow.MediaPlayer.Position = line.LrcTime.Value;
         }
