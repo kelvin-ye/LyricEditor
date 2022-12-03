@@ -55,6 +55,7 @@ namespace LyricEditor
         /// 表示句末是否停顿
         /// </summary>
         private bool isJuTing = false;
+        bool importClickOk = false;
 
 
 
@@ -152,17 +153,18 @@ namespace LyricEditor
             if (!IsMediaAvailable)
             {
                 ImportMedia_Click(this, null); //参数无用
-                int i = 0;
-                for ( i = 0; i < 100; i++){
-                    if (IsMediaAvailable)
-                        break;
-                    Thread.Sleep(500);
-                }
-                if (i== 100)
+                if (importClickOk == true)
                 {
-                    MessageBox.Show("文件导入失败", "文件导入提示");
+                    int i = 0,max=10;
+                    for ( i = 0; i < max; i++){
+                        if (IsMediaAvailable)
+                            break;
+                        Thread.Sleep(500);
+                    }
+                  
                 }
-                return;
+                if (!IsMediaAvailable)
+                    return;
             }
 
             MediaPlayer.Play();
@@ -324,8 +326,13 @@ namespace LyricEditor
 
             if (ofd.ShowDialog() == Forms.DialogResult.OK)
             {
+                importClickOk = true;
                 ImportMedia(ofd.FileName);
                 FileName = ofd.FileName;
+             }
+            else
+            {
+                importClickOk = false;
             }
         }
         /// <summary>

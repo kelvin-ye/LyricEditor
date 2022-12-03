@@ -21,7 +21,7 @@
                   FontSize="16"
                   SelectionMode="Single"
                   MouseDoubleClick="LrcLinePanel_MouseDoubleClick"
-                  PreviewMouseLeftButtonDown="LrcLinePanel_MouseLeftButtonUp"
+                  MouseLeftButtonUp="LrcLinePanel_MouseLeftButtonUp"
                   PreviewMouseRightButtonDown="LrcLinePanel_MouseRightButtonDown"
                   KeyUp="LrcLinePanel_KeyUp"
                   FontFamily="{StaticResource LyricFont}"

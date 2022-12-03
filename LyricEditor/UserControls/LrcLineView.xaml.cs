@@ -24,7 +24,7 @@ namespace LyricEditor.UserControls
         }
         public LrcManager Manager { get; set; }
         public MainWindow MyMainWindow;
-        bool 左键触发的;
+        bool SelectionChanged已播放;
         bool 右键触发的;
 
         //public double  jumoTime = 0; // 根据下一行的起始时间得出的句末时间
@@ -205,14 +205,9 @@ namespace LyricEditor.UserControls
                 右键触发的 = false;
                 return;
             }
-            if (左键触发的 == true)
-            {
-                Console.WriteLine("SelectionChanged,左键触发的={0}", 左键触发的);
-                左键触发的 = false;
-                return;
-            }
+
             play播放本行();
-            左键触发的 = true;
+            SelectionChanged已播放 = true;
         }
 
         /// <summary>
@@ -221,19 +216,18 @@ namespace LyricEditor.UserControls
         private void LrcLinePanel_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             return;
-            Console.WriteLine("LrcLinePanel_MouseDoubleClick");
-            if (左键触发的 == true)
-                {
-                左键触发的 = false;
-                return;
-            }
-            play播放本行();
+
         }
 
         private void LrcLinePanel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Console.WriteLine("LrcLinePanel_MouseLeftButtonUp");
-            左键触发的 = true;
+            if (SelectionChanged已播放 == true)
+            {
+                Console.WriteLine("SelectionChanged已播放");
+                SelectionChanged已播放 = false;
+                return;
+            }
             play播放本行();
         }
 
