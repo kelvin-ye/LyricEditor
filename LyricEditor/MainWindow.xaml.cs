@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Forms = System.Windows.Forms;
+using System.Threading;
 
 namespace LyricEditor
 {
@@ -151,6 +152,16 @@ namespace LyricEditor
             if (!IsMediaAvailable)
             {
                 ImportMedia_Click(this, null); //参数无用
+                int i = 0;
+                for ( i = 0; i < 100; i++){
+                    if (IsMediaAvailable)
+                        break;
+                    Thread.Sleep(500);
+                }
+                if (i== 100)
+                {
+                    MessageBox.Show("文件导入失败", "文件导入提示");
+                }
                 return;
             }
 
