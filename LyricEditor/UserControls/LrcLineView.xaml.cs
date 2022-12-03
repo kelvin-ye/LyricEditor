@@ -22,6 +22,7 @@ namespace LyricEditor.UserControls
         }
         public LrcManager Manager { get; set; }
         public MainWindow MyMainWindow;
+        bool slectedChange已经处理;
 
         //public double  jumoTime = 0; // 根据下一行的起始时间得出的句末时间
         public TimeSpan jumoTime { get; set; } = new TimeSpan(0, 0, 0, 0, 0); // 根据下一行的起始时间得出的句末时间
@@ -86,8 +87,14 @@ namespace LyricEditor.UserControls
         private void LrcLinePanel_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!HasSelection) return;
-            UpdateBottomTextBoxes();
+            Console.WriteLine("SelectionChanged");
+            //UpdateBottomTextBoxes();
+            slectedChange已经处理 = true;
+            doubleClick();
         }
+
+    
+
         /// <summary>
         /// 更改时间框的文本，更新主列表
         /// </summary>
@@ -196,6 +203,30 @@ namespace LyricEditor.UserControls
         /// </summary>
         private void LrcLinePanel_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            return;
+            Console.WriteLine("LrcLinePanel_MouseDoubleClick");
+            if (slectedChange已经处理 == true)
+                {
+                slectedChange已经处理 = false;
+                return;
+            }
+            doubleClick();
+        }
+
+        private void LrcLinePanel_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Console.WriteLine("LrcLinePanel_MouseUp");
+            if (slectedChange已经处理 == true)
+            {
+                slectedChange已经处理 = false;
+                return;
+            }
+            doubleClick();
+        }
+
+        private void doubleClick()
+        {
+            Console.WriteLine("doubleClick");
             if (!HasSelection) return;
 
             LrcLine line = LrcLinePanel.SelectedItem as LrcLine;
@@ -204,15 +235,20 @@ namespace LyricEditor.UserControls
 
             MyMainWindow.MediaPlayer.Position = line.LrcTime.Value;
         }
+
         /// <summary>
         /// 在主列表上使用按键
         /// </summary>
         private void LrcLinePanel_KeyUp(object sender, KeyEventArgs e)
         {
+            //Console.WriteLine("upupupupupupupupupupupu");
             switch (e.Key)
             {
                 case Key.Delete:
                     DeleteLine();
+                    break;
+                case Key.Enter:
+                    doubleClick();
                     break;
             }
         }
@@ -296,6 +332,46 @@ namespace LyricEditor.UserControls
         {
             Manager.ShowNextLine(LrcLinePanel);
         }
+
+        static void ResponseWrite()
+        {
+            ResponseWriteError();
+        }
+        static void ResponseWriteError()
+        {
+            //将错误信息写入日志
+            Console.WriteLine(GetStackTraceModelName());
+        }
+        /// <summary>
+        /// @Author:      HTL
+        /// @Email:       Huangyuan413026@163.com
+        /// @DateTime:    2015-06-03 19:54:49
+        /// @Description: 获取当前堆栈的上级调用方法列表,直到最终调用者,只会返回调用的各方法,而不会返回具体的出错行数，可参考：微软真是个十足的混蛋啊！让我们跟踪Exception到行把！（不明真相群众请入） 
+        /// </summary>
+        /// <returns></returns>
+        static string GetStackTraceModelName()
+        {
+            //当前堆栈信息
+            System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackFrame[] sfs = st.GetFrames();
+            //过虑的方法名称,以下方法将不会出现在返回的方法调用列表中
+            string _filterdName = "ResponseWrite,ResponseWriteError,";
+            string _fullName = string.Empty, _methodName = string.Empty;
+            for (int i = 1; i < sfs.Length; ++i)
+            {
+                //非用户代码,系统方法及后面的都是系统调用，不获取用户代码调用结束
+                if (System.Diagnostics.StackFrame.OFFSET_UNKNOWN == sfs[i].GetILOffset()) break;
+                _methodName = sfs[i].GetMethod().Name;//方法名称
+                                                      //sfs[i].GetFileLineNumber();//没有PDB文件的情况下将始终返回0
+                if (_filterdName.Contains(_methodName)) continue;
+                _fullName = _methodName + "()->" + _fullName;
+            }
+            st = null;
+            sfs = null;
+            _filterdName = _methodName = null;
+            return _fullName.TrimEnd('-', '>');
+        }
+
 
     }
 }
